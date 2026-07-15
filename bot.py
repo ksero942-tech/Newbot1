@@ -103,7 +103,6 @@ def init_db():
         )
     ''')
     
-    # Миграции
     for col in ['pass_exp', 'pass_lvl', 'slots_unlocked', 'mult_gold_lvl', 'mult_atk_lvl']:
         try: cursor.execute(f"ALTER TABLE users ADD COLUMN {col} INTEGER DEFAULT 0")
         except sqlite3.OperationalError: pass
@@ -145,64 +144,79 @@ def notify_all_players(text):
 
 # --- СИСТЕМА ШАНСОВ ---
 RARITIES = {
-    "Обычная": {"chance": 0.50},
-    "Необычная": {"chance": 0.25},
-    "Редкая": {"chance": 0.15},
-    "Эпическая": {"chance": 0.07},
-    "Легендарная": {"chance": 0.025},
-    "Мифическая": {"chance": 0.004},
-    "Божественная": {"chance": 0.001}
+    "Обычный": {"chance": 0.45},
+    "Необычный": {"chance": 0.25},
+    "Редкий": {"chance": 0.15},
+    "Эпический": {"chance": 0.08},
+    "Легендарный": {"chance": 0.04},
+    "Мифический": {"chance": 0.015},
+    "Божественный": {"chance": 0.005}
 }
 
 RARITY_COLORS = {
-    "Обычная": "⬜",
-    "Необычная": "🟢",
-    "Редкая": "🔵",
-    "Эпическая": "🟣",
-    "Легендарная": "🟠",
-    "Мифическая": "🟡",
-    "Божественная": "💠",
-    "УЛЬТРА": "💀",
-    "Эксклюзив": "👑"
+    "Обычный": "⬜",
+    "Необычный": "🟢",
+    "Редкий": "🔵",
+    "Эпический": "🟣",
+    "Легендарный": "🟠",
+    "Мифический": "🟡",
+    "Божественный": "💠",
+    "Супер": "🔥",
+    "УЛЬТРА": "💀"
 }
 
-# --- РЕЕСТР ЮНИТОВ (ФЭНТЕЗИ) ---
-UNITS = {
-    # Обычные (2)
-    "Скелет-воин": {"rarity": "Обычная", "hp": 80, "atk": 10},
-    "Гоблин-лутник": {"rarity": "Обычная", "hp": 70, "atk": 12},
-    # Необычные (2)
-    "Орк-берсерк": {"rarity": "Необычная", "hp": 120, "atk": 20},
-    "Эльф-следопыт": {"rarity": "Необычная", "hp": 100, "atk": 22},
-    # Редкие (2)
-    "Рыцарь-паладин": {"rarity": "Редкая", "hp": 180, "atk": 35},
-    "Маг-пиромант": {"rarity": "Редкая", "hp": 150, "atk": 40},
-    # Эпические (2)
-    "Дракон-страж": {"rarity": "Эпическая", "hp": 280, "atk": 65},
-    "Демон-разрушитель": {"rarity": "Эпическая", "hp": 250, "atk": 70},
-    # Легендарные (2)
-    "Феникс": {"rarity": "Легендарная", "hp": 400, "atk": 110},
-    "Титан-громовержец": {"rarity": "Легендарная", "hp": 450, "atk": 100},
-    # Мифические (2)
-    "Дракон-император": {"rarity": "Мифическая", "hp": 700, "atk": 180},
-    "Архангел-мститель": {"rarity": "Мифическая", "hp": 750, "atk": 170},
-    # Божественные (2)
-    "Создатель миров": {"rarity": "Божественная", "hp": 1200, "atk": 300},
-    "Вечный страж": {"rarity": "Божественная", "hp": 1100, "atk": 320},
-    # УЛЬТРА (из кризиса)
-    "Ультра-Некрос": {"rarity": "УЛЬТРА", "hp": 2500, "atk": 550},
+# --- РЕЕСТР РИГОВ ---
+RIGS = {
+    # Обычные
+    "Базовый Риг": {"rarity": "Обычный", "hp": 80, "atk": 10},
+    "Стандартный Риг": {"rarity": "Обычный", "hp": 85, "atk": 9},
+    # Необычные
+    "Усиленный Риг": {"rarity": "Необычный", "hp": 120, "atk": 18},
+    "Боевой Риг": {"rarity": "Необычный", "hp": 110, "atk": 22},
+    # Редкие
+    "Элитный Риг": {"rarity": "Редкий", "hp": 170, "atk": 32},
+    "Штурмовой Риг": {"rarity": "Редкий", "hp": 180, "atk": 30},
+    # Эпические
+    "Командор Риг": {"rarity": "Эпический", "hp": 260, "atk": 55},
+    "Разрушитель Риг": {"rarity": "Эпический", "hp": 280, "atk": 50},
+    # Легендарные
+    "Легендарный Риг": {"rarity": "Легендарный", "hp": 420, "atk": 95},
+    "Космический Риг": {"rarity": "Легендарный", "hp": 400, "atk": 105},
+    # Мифические
+    "Мифический Риг": {"rarity": "Мифический", "hp": 680, "atk": 160},
+    "Древний Риг": {"rarity": "Мифический", "hp": 720, "atk": 150},
+    # Божественные
+    "Божественный Риг": {"rarity": "Божественный", "hp": 1100, "atk": 280},
+    "Абсолютный Риг": {"rarity": "Божественный", "hp": 1200, "atk": 270},
+    # Супер (только из пака)
+    "Гигантский Коррупт Риг": {"rarity": "Супер", "hp": 2200, "atk": 500},
+    # УЛЬТРА (из пака с шансом 0.1%)
+    "Ксеро": {"rarity": "УЛЬТРА", "hp": 5000, "atk": 1200},
     # Эксклюзив (из пасса)
-    "Король-лич": {"rarity": "Эксклюзив", "hp": 1800, "atk": 450},
+    "Король Ригов": {"rarity": "Эксклюзив", "hp": 3500, "atk": 800},
     # Крафтовый
-    "Первородный хаос": {"rarity": "Эксклюзив", "hp": 3000, "atk": 700},
-    # Пак
-    "Небесный дракон": {"rarity": "Легендарная", "hp": 500, "atk": 130}
+    "Изначальный Риг": {"rarity": "Эксклюзив", "hp": 4500, "atk": 1100}
 }
 
-UNITS_LIST = list(UNITS.keys())
-INDEX_UNITS = [u for u in UNITS_LIST if UNITS[u]["rarity"] not in ["УЛЬТРА", "Эксклюзив"]]
+# --- ПАК ЮНИТОВ ---
+PACK_RIGS = {
+    "Корруптед Риг": 50.0,
+    "Корруптед Генерал Риг": 30.0,
+    "Темный Лорд Риг": 10.0,
+    "Корруптированая Риганутость": 8.9,
+    "Гигантский Коррупт Риг": 1.0,
+    "Ксеро": 0.1
+}
 
-# --- ВАРИАНТЫ ЮНИТОВ ---
+def roll_pack():
+    names = list(PACK_RIGS.keys())
+    chances = list(PACK_RIGS.values())
+    return random.choices(names, weights=chances)[0]
+
+# --- СПИСОК ДЛЯ ИНДЕКСА (без Супер, УЛЬТРА, Эксклюзив) ---
+ALL_RIGS = list(RIGS.keys())
+INDEX_RIGS = [r for r in ALL_RIGS if RIGS[r]["rarity"] not in ["Супер", "УЛЬТРА", "Эксклюзив"]]
+
 UNIT_VARIANTS = {
     "обычный": {"mult": 1.0, "label": ""},
     "золотой": {"mult": 1.2, "label": "⭐ ЗОЛОТОЙ"},
@@ -217,27 +231,13 @@ def get_unit_variant():
         return "золотой"
     return "обычный"
 
-# --- ПАК ---
-PACK_UNITS = {
-    "Небесный дракон": ("Легендарная", 30.0),
-    "Феникс": ("Легендарная", 25.0),
-    "Титан-громовержец": ("Легендарная", 25.0),
-    "Дракон-император": ("Мифическая", 15.0),
-    "Архангел-мститель": ("Мифическая", 5.0)
-}
-
-def roll_pack():
-    names = list(PACK_UNITS.keys())
-    chances = [PACK_UNITS[n][1] for n in names]
-    return random.choices(names, weights=chances)[0]
-
-# --- НАСТРОЙКИ СЛОЖНОСТИ ---
+# --- СЛОЖНОСТИ ---
 DIFFICULTIES = {
-    "easy": {"name": "Легко", "mult": 0.5, "gold": (5, 15), "exp": 10, "enemies": 1},
-    "normal": {"name": "Нормал", "mult": 1.0, "gold": (15, 30), "exp": 25, "enemies": 1},
-    "hard": {"name": "Сложно", "mult": 1.8, "gold": (35, 65), "exp": 55, "enemies": 2},
-    "nightmare": {"name": "Кошмар", "mult": 3.0, "gold": (80, 150), "exp": 120, "enemies": 2},
-    "legendary": {"name": "Легендарная", "mult": 5.0, "gold": (200, 350), "exp": 350, "enemies": 2}
+    "easy": {"name": "🟢 Легко", "mult": 0.5, "gold": (5, 15), "exp": 10, "enemies": 1},
+    "normal": {"name": "🔵 Нормал", "mult": 1.0, "gold": (15, 30), "exp": 25, "enemies": 1},
+    "hard": {"name": "🟠 Сложно", "mult": 1.8, "gold": (35, 65), "exp": 55, "enemies": 2},
+    "nightmare": {"name": "🔴 Кошмар", "mult": 3.0, "gold": (80, 150), "exp": 120, "enemies": 2},
+    "legendary": {"name": "🟣 Легендарная", "mult": 5.0, "gold": (200, 350), "exp": 350, "enemies": 2}
 }
 
 # --- БОЕВОЙ ПАСС ---
@@ -247,21 +247,21 @@ def get_pass_exp_required(level):
     return int(80 + (level - 1) * 120)
 
 PASS_REWARDS = {
-    1: {"type": "gold", "amount": 100, "name": "100 Золота"},
-    2: {"type": "gold", "amount": 150, "name": "150 Золота"},
-    3: {"type": "gold", "amount": 200, "name": "200 Золота"},
-    4: {"type": "gold", "amount": 250, "name": "250 Золота"},
-    5: {"type": "gold", "amount": 300, "name": "300 Золота"},
-    6: {"type": "gold", "amount": 400, "name": "400 Золота"},
-    7: {"type": "gold", "amount": 500, "name": "500 Золота"},
-    8: {"type": "pack", "amount": 1, "name": "1x Легендарный пак 📦"},
-    9: {"type": "gold", "amount": 600, "name": "600 Золота"},
-    10: {"type": "gold", "amount": 750, "name": "750 Золота"},
-    11: {"type": "pack", "amount": 2, "name": "2x Легендарный пак 📦"},
-    12: {"type": "gold", "amount": 900, "name": "900 Золота"},
-    13: {"type": "pack", "amount": 3, "name": "3x Легендарный пак 📦"},
-    14: {"type": "gold", "amount": 1100, "name": "1100 Золота"},
-    15: {"type": "unit_rarity", "rarity": "Эксклюзив", "name": "ЭКСКЛЮЗИВНЫЙ ЮНИТ 👑 Король-лич"}
+    1: {"type": "gold", "amount": 100, "name": "100 💰"},
+    2: {"type": "gold", "amount": 150, "name": "150 💰"},
+    3: {"type": "gold", "amount": 200, "name": "200 💰"},
+    4: {"type": "gold", "amount": 250, "name": "250 💰"},
+    5: {"type": "gold", "amount": 300, "name": "300 💰"},
+    6: {"type": "gold", "amount": 400, "name": "400 💰"},
+    7: {"type": "gold", "amount": 500, "name": "500 💰"},
+    8: {"type": "pack", "amount": 1, "name": "📦 Пак Ригов"},
+    9: {"type": "gold", "amount": 600, "name": "600 💰"},
+    10: {"type": "gold", "amount": 750, "name": "750 💰"},
+    11: {"type": "pack", "amount": 2, "name": "📦📦 2 Пака"},
+    12: {"type": "gold", "amount": 900, "name": "900 💰"},
+    13: {"type": "pack", "amount": 3, "name": "📦📦📦 3 Пака"},
+    14: {"type": "gold", "amount": 1100, "name": "1100 💰"},
+    15: {"type": "unit_rarity", "rarity": "Эксклюзив", "name": "👑 Король Ригов"}
 }
 
 # --- ЛИДЕРБОРД ---
@@ -294,7 +294,7 @@ def reset_leaderboard():
                       (user[0], user[1], user[2]))
     conn.commit()
     return_db_connection(conn)
-    notify_all_players("🏆 **НЕДЕЛЬНЫЙ РЕЙТИНГ ОБНОВЛЕН!** Награды выданы! 🚀")
+    notify_all_players("🏆 **Рейтинг обновлен!** Награды выданы! 🚀")
 
 def get_week_time_left():
     now = datetime.now()
@@ -367,16 +367,19 @@ def give_pass_reward(user_id, lvl):
     elif reward["type"] == "pack":
         for _ in range(reward["amount"]):
             card_name = roll_pack()
-            unit = UNITS[card_name]
+            unit = RIGS.get(card_name)
+            if not unit:
+                unit = RIGS["Базовый Риг"]
+                card_name = "Базовый Риг"
             variant = get_unit_variant()
             mult = UNIT_VARIANTS[variant]["mult"]
             cursor.execute("INSERT INTO inventory (user_id, card_name, rarity, level, hp, atk, variant) VALUES (?, ?, ?, 1, ?, ?, ?)",
                           (user_id, card_name, unit["rarity"], int(unit["hp"]*mult), int(unit["atk"]*mult), variant))
     elif reward["type"] == "unit_rarity":
-        av_units = [n for n,u in UNITS.items() if u["rarity"] == reward["rarity"]]
+        av_units = [n for n,u in RIGS.items() if u["rarity"] == reward["rarity"]]
         if av_units:
             u_name = random.choice(av_units)
-            u_data = UNITS[u_name]
+            u_data = RIGS[u_name]
             cursor.execute("INSERT INTO inventory (user_id, card_name, rarity, level, hp, atk, variant) VALUES (?, ?, ?, 1, ?, ?, ?)",
                           (user_id, u_name, u_data["rarity"], u_data["hp"], u_data["atk"], "обычный"))
     conn.commit()
@@ -393,7 +396,7 @@ def get_equipped_team(user_id):
     return_db_connection(conn)
     return [{"id": c[0], "name": c[1], "rarity": c[2], "level": c[3], "hp": c[4], "atk": c[5], "variant": c[6]} for c in cards]
 
-def generate_hp_bar(current, maximum, length=8):
+def generate_hp_bar(current, maximum, length=10):
     if maximum <= 0: return "░" * length
     filled = int(round(max(0, min(1, current/maximum)) * length))
     return "❤️" + "█" * filled + "░" * (length - filled)
@@ -409,7 +412,7 @@ def calculate_stats(base_hp, base_atk, level, variant="обычный"):
 def create_unit(user_id, card_name, variant=None):
     if variant is None:
         variant = get_unit_variant()
-    unit = UNITS[card_name]
+    unit = RIGS[card_name]
     mult = UNIT_VARIANTS[variant]["mult"]
     hp, atk = int(unit["hp"] * mult), int(unit["atk"] * mult)
     conn = get_db_connection()
@@ -434,25 +437,32 @@ def consolidate_inventory(user_id):
     conn.commit()
     return_db_connection(conn)
 
+def safe_edit(chat_id, message_id, text, reply_markup=None):
+    try:
+        BOT.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode="Markdown", reply_markup=reply_markup)
+    except ApiTelegramException as e:
+        if "message is not modified" not in str(e):
+            pass
+
 # --- КЛАВИАТУРА ---
 def main_keyboard(user_id):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    kb.add("🎮 Игровой центр", "📊 Рейтинги", "📖 Индекс")
+    kb.add("🎮 Центр", "📊 Рейтинг", "📖 Индекс")
     if user_id in [ADMIN_ID, ADMIN_ID_2]:
-        kb.add("👑 Админ Панель")
+        kb.add("👑 Админ")
     return kb
 
-@BOT.message_handler(func=lambda m: m.text == "🎮 Игровой центр")
+@BOT.message_handler(func=lambda m: m.text == "🎮 Центр")
 def game_center(message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    kb.add("👤 Профиль", "🎒 Инвентарь", "🔮 Призыв", "🏪 Магазин", "🏰 Данж", "👹 Босс", "🎫 Боевой Пасс", "🔧 Крафт", "⬅️ Назад")
-    BOT.send_message(message.chat.id, "🎮 **Игровой центр**", reply_markup=kb)
+    kb.add("👤 Профиль", "🎒 Риги", "🔮 Призыв", "🏪 Магазин", "🏰 Битва", "👹 Босс", "🎫 Пасс", "🔧 Крафт", "⬅️ Назад")
+    BOT.send_message(message.chat.id, "⚔️ **ЦЕНТР УПРАВЛЕНИЯ**\nВыберите раздел:", reply_markup=kb)
 
-@BOT.message_handler(func=lambda m: m.text == "📊 Рейтинги")
+@BOT.message_handler(func=lambda m: m.text == "📊 Рейтинг")
 def ratings_menu(message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
     kb.add("🏆 Топ", "⬅️ Назад")
-    BOT.send_message(message.chat.id, "📊 **Рейтинги**", reply_markup=kb)
+    BOT.send_message(message.chat.id, "📊 **РЕЙТИНГИ**", reply_markup=kb)
 
 @BOT.message_handler(func=lambda m: m.text == "⬅️ Назад")
 def back_to_main(message):
@@ -461,22 +471,22 @@ def back_to_main(message):
 @BOT.message_handler(commands=['start'])
 def start_cmd(message):
     get_user(message.from_user.id, message.from_user.first_name)
-    BOT.send_message(message.chat.id, "⚔️ **Фэнтези-RPG Бот запущен!**", reply_markup=main_keyboard(message.from_user.id))
+    BOT.send_message(message.chat.id, "⚔️ **ДОБРО ПОЖАЛОВАТЬ В МИР РИГОВ!**", reply_markup=main_keyboard(message.from_user.id))
 
 # --- ПРОФИЛЬ ---
 @BOT.message_handler(func=lambda m: m.text == "👤 Профиль")
 def profile_menu(message):
     user = get_user(message.from_user.id, message.from_user.first_name)
     team = get_equipped_team(message.from_user.id)
-    team_text = "\n".join([f" ▪️ {RARITY_COLORS.get(c['rarity'], '')} {c['name']} [Ур.{c['level']}] [⚔️{c['atk']}] {UNIT_VARIANTS.get(c.get('variant','обычный'),{}).get('label','')}" for c in team]) or " Отряд пуст."
+    team_text = "\n".join([f" ▪️ {RARITY_COLORS.get(c['rarity'], '')} {c['name']} [Ур.{c['level']}] [⚔️{c['atk']}] {UNIT_VARIANTS.get(c.get('variant','обычный'),{}).get('label','')}" for c in team]) or " ⚠️ Отряд пуст."
     
     if user["pass_lvl"] < 15:
         needed = get_pass_exp_required(user["pass_lvl"])
         progress = f"{user['pass_exp']}/{needed} XP"
     else:
-        progress = "МАКСИМУМ ✅"
+        progress = "✅ МАКСИМУМ"
     
-    text = f"👤 **ПРОФИЛЬ:** {user['username']}\n\n🏆 Кубки: {user['trophies']}\n💰 Золото: {user['gold']}\n⭐ Опыт: {user['exp']}\n🎫 Боевой Пасс: {user['pass_lvl']}/15 ({progress})\n🔓 Слотов: {user['slots_unlocked']}/4\n📈 Множитель: Золото +{user['mult_gold_lvl']*25}% | Урон +{user['mult_atk_lvl']*15}%\n\n🛡 **Отряд:**\n{team_text}"
+    text = f"👤 **ПРОФИЛЬ**\n━━━━━━━━━━━━━━━\n`{user['username']}`\n\n🏆 Кубки: **{user['trophies']}**\n💰 Золото: **{user['gold']}**\n⭐ Опыт: **{user['exp']}**\n\n🎫 Боевой Пасс: **{user['pass_lvl']}/15**\n📊 Прогресс: `{progress}`\n\n🔓 Слотов: **{user['slots_unlocked']}/4**\n📈 Множители:\n▸ Золото: `+{user['mult_gold_lvl']*25}%`\n▸ Урон: `+{user['mult_atk_lvl']*15}%`\n\n🛡 **ОТРЯД:**\n{team_text}"
     BOT.send_message(message.chat.id, text, parse_mode="Markdown")
 
 # --- ИНВЕНТАРЬ ---
@@ -488,16 +498,16 @@ def send_inventory(chat_id, user_id, page=0):
     cards = cursor.fetchall()
     return_db_connection(conn)
     if not cards:
-        return BOT.send_message(chat_id, "🎒 Инвентарь пуст.")
+        return BOT.send_message(chat_id, "🎒 **Инвентарь пуст**\nИспользуйте `/start` для начала игры!")
     
     limit, total_pages = 10, (len(cards)+9)//10
     page = max(0, min(page, total_pages-1))
     start, end = page*limit, min((page+1)*limit, len(cards))
     
-    text = f"🎒 **Инвентарь (Стр.{page+1}/{total_pages}):**"
+    text = f"🎒 **ИНВЕНТАРЬ**\nСтраница {page+1}/{total_pages}\n━━━━━━━━━━━━━━━\n"
     kb = types.InlineKeyboardMarkup(row_width=1)
     for c in cards[start:end]:
-        status = "🛡 " if c[6] else ""
+        status = "🛡 " if c[6] else "📦 "
         variant_label = UNIT_VARIANTS.get(c[7] if len(c)>7 else "обычный", {}).get("label", "")
         kb.add(types.InlineKeyboardButton(f"{status}{RARITY_COLORS.get(c[2],'')} {c[1]} [{c[2]}] Ур.{c[3]} {variant_label}", 
                                          callback_data=f"inv_{c[0]}_{page}"))
@@ -508,7 +518,7 @@ def send_inventory(chat_id, user_id, page=0):
     if nav: kb.row(*nav)
     BOT.send_message(chat_id, text, reply_markup=kb)
 
-@BOT.message_handler(func=lambda m: m.text == "🎒 Инвентарь")
+@BOT.message_handler(func=lambda m: m.text == "🎒 Риги")
 def inventory_menu_msg(message):
     send_inventory(message.chat.id, message.from_user.id, 0)
 
@@ -532,17 +542,16 @@ def show_card_details(chat_id, message_id, card_id, from_page):
     return_db_connection(conn)
     if not card: return
 
-    kb = types.InlineKeyboardMarkup(row_width=3)
-    kb.add(types.InlineKeyboardButton("❌ Деактивировать" if card[6] else "🛡 Активировать", 
+    kb = types.InlineKeyboardMarkup(row_width=2)
+    kb.add(types.InlineKeyboardButton("🛡 Активировать" if not card[6] else "❌ Деактивировать", 
                                      callback_data=f"eq_{1 if not card[6] else 0}_{card_id}_{from_page}"))
-    
-    for opt in [1, 10, 25]:
-        cost = get_upgrade_cost(card[3], opt)
-        kb.add(types.InlineKeyboardButton(f"+{opt} (💰{cost})", callback_data=f"bulkup_{opt}_{card_id}_{from_page}"))
+    kb.add(types.InlineKeyboardButton("⭐ +1", callback_data=f"bulkup_1_{card_id}_{from_page}"))
+    kb.add(types.InlineKeyboardButton("⭐ +10", callback_data=f"bulkup_10_{card_id}_{from_page}"))
+    kb.add(types.InlineKeyboardButton("⭐ +25", callback_data=f"bulkup_25_{card_id}_{from_page}"))
     kb.add(types.InlineKeyboardButton("⬅️ Назад", callback_data=f"invpage_{from_page}"))
     
     variant_label = UNIT_VARIANTS.get(card[7] if len(card)>7 else "обычный", {}).get("label", "")
-    text = f"🃏 **{card[1]}**\n📊 {RARITY_COLORS.get(card[2],'')} {card[2]}\n⭐ Ур.{card[3]}\n❤️ HP: {card[4]}\n⚔️ ATK: {card[5]}\n💎 {variant_label or 'Обычный'}"
+    text = f"🃏 **{card[1]}**\n━━━━━━━━━━━━━━━\n📊 Редкость: {RARITY_COLORS.get(card[2],'')} {card[2]}\n⭐ Уровень: **{card[3]}**\n❤️ HP: **{card[4]}**\n⚔️ ATK: **{card[5]}**\n💎 Вариант: {variant_label or 'Обычный'}\n{'🛡 АКТИВЕН' if card[6] else '📦 В инвентаре'}"
     safe_edit(chat_id, message_id, text, reply_markup=kb)
 
 @BOT.callback_query_handler(func=lambda c: c.data.startswith("bulkup_"))
@@ -560,7 +569,7 @@ def process_bulk_upgrade(callback):
         return_db_connection(conn)
         return BOT.answer_callback_query(callback.id, f"❌ Нужно: {cost} 💰", show_alert=True)
     new_level = card[0] + times
-    base = UNITS.get(card[1], {"hp": 100, "atk": 10})
+    base = RIGS.get(card[1], {"hp": 100, "atk": 10})
     new_hp, new_atk = calculate_stats(base["hp"], base["atk"], new_level, card[2] if len(card)>2 else "обычный")
     cursor.execute("UPDATE inventory SET level = ?, hp = ?, atk = ? WHERE id = ?", (new_level, new_hp, new_atk, card_id))
     conn.commit()
@@ -574,14 +583,29 @@ def process_equip(callback):
     _, action, card_id, from_page = callback.data.split("_")
     action, card_id, from_page = int(action), int(card_id), int(from_page)
     user = get_user(callback.from_user.id)
-    if action == 1 and len(get_equipped_team(callback.from_user.id)) >= user["slots_unlocked"]:
-        return BOT.answer_callback_query(callback.id, f"❌ Лимит отряда ({user['slots_unlocked']})!", show_alert=True)
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE inventory SET is_equipped = ? WHERE id = ?", (action, card_id))
-    conn.commit()
-    return_db_connection(conn)
+    
+    # Если активируем
+    if action == 1:
+        current_team = get_equipped_team(callback.from_user.id)
+        if len(current_team) >= user["slots_unlocked"]:
+            return BOT.answer_callback_query(callback.id, f"❌ Лимит отряда ({user['slots_unlocked']})! Купите слот в магазине.", show_alert=True)
+        
+        # Деактивируем всех остальных
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE inventory SET is_equipped = 0 WHERE user_id = ? AND is_equipped = 1", (callback.from_user.id,))
+        cursor.execute("UPDATE inventory SET is_equipped = 1 WHERE id = ?", (card_id,))
+        conn.commit()
+        return_db_connection(conn)
+    else:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE inventory SET is_equipped = 0 WHERE id = ?", (card_id,))
+        conn.commit()
+        return_db_connection(conn)
+    
     clear_user_cache(callback.from_user.id)
+    BOT.answer_callback_query(callback.id, "✅ Готово!", show_alert=False)
     show_card_details(callback.message.chat.id, callback.message.message_id, card_id, from_page)
 
 # --- ПРИЗЫВ ---
@@ -589,7 +613,7 @@ def process_equip(callback):
 def summon_menu(message):
     user = get_user(message.from_user.id)
     luck = float(get_setting("luck_multiplier", "1.0"))
-    text = f"🔮 **Призыв героев**\n💰 Золото: {user['gold']}\n🎟 Цена: 100 золота\n🔮 Удача: {luck}x"
+    text = f"🔮 **ПРИЗЫВ РИГОВ**\n━━━━━━━━━━━━━━━\n💰 Золото: **{user['gold']}**\n🎟 Стоимость: **100** золота\n🔮 Удача: **{luck}x**"
     kb = types.InlineKeyboardMarkup(row_width=2)
     kb.add(
         types.InlineKeyboardButton("1x 💰100", callback_data="buy_summon"),
@@ -608,7 +632,7 @@ def process_summon(callback):
     chances = {}
     total = 0.0
     for rarity, data in RARITIES.items():
-        chance = data["chance"] * (luck if rarity != "Обычная" else 1.0)
+        chance = data["chance"] * (luck if rarity != "Обычный" else 1.0)
         chances[rarity] = chance
         total += chance
     chances = {r: c/total for r,c in chances.items()}
@@ -621,12 +645,12 @@ def process_summon(callback):
             selected_rarity = rarity
             break
     else:
-        selected_rarity = "Обычная"
+        selected_rarity = "Обычный"
     
-    avail = [n for n,u in UNITS.items() if u["rarity"] == selected_rarity]
+    avail = [n for n,u in RIGS.items() if u["rarity"] == selected_rarity]
     if not avail:
-        selected_rarity = "Обычная"
-        avail = [n for n,u in UNITS.items() if u["rarity"] == "Обычная"]
+        selected_rarity = "Обычный"
+        avail = [n for n,u in RIGS.items() if u["rarity"] == "Обычный"]
     card_name = random.choice(avail)
     variant = get_unit_variant()
     variant_label = UNIT_VARIANTS[variant]["label"]
@@ -636,7 +660,7 @@ def process_summon(callback):
     consolidate_inventory(callback.from_user.id)
     
     safe_edit(callback.message.chat.id, callback.message.message_id,
-              f"✨ **Призван:** {RARITY_COLORS.get(selected_rarity, '')} **{card_name}**\n📊 {selected_rarity}\n⭐ Ур.1\n❤️ HP: {hp} | ⚔️ ATK: {atk}\n{variant_label}")
+              f"✨ **ПРИЗВАН РИГ!**\n━━━━━━━━━━━━━━━\n{RARITY_COLORS.get(selected_rarity, '')} **{card_name}**\n📊 {selected_rarity}\n⭐ Ур.1\n❤️ HP: {hp}\n⚔️ ATK: {atk}\n{variant_label}")
 
 @BOT.callback_query_handler(func=lambda c: c.data.startswith("multisummon_"))
 def multi_summon(callback):
@@ -650,7 +674,7 @@ def multi_summon(callback):
     chances = {}
     total = 0.0
     for rarity, data in RARITIES.items():
-        chance = data["chance"] * (luck if rarity != "Обычная" else 1.0)
+        chance = data["chance"] * (luck if rarity != "Обычный" else 1.0)
         chances[rarity] = chance
         total += chance
     chances = {r: c/total for r,c in chances.items()}
@@ -665,8 +689,8 @@ def multi_summon(callback):
                 selected_rarity = rarity
                 break
         else:
-            selected_rarity = "Обычная"
-        avail = [n for n,u in UNITS.items() if u["rarity"] == selected_rarity] or [n for n,u in UNITS.items() if u["rarity"] == "Обычная"]
+            selected_rarity = "Обычный"
+        avail = [n for n,u in RIGS.items() if u["rarity"] == selected_rarity] or [n for n,u in RIGS.items() if u["rarity"] == "Обычный"]
         card_name = random.choice(avail)
         results[card_name] = results.get(card_name, 0) + 1
     
@@ -676,10 +700,10 @@ def multi_summon(callback):
             create_unit(callback.from_user.id, card_name, get_unit_variant())
     consolidate_inventory(callback.from_user.id)
     
-    text = f"🔮 **МУЛЬТИ-ПРИЗЫВ** x{amount}\n\n"
+    text = f"🔮 **МУЛЬТИ-ПРИЗЫВ** x{amount}\n━━━━━━━━━━━━━━━\n"
     for card_name, count in sorted(results.items(), key=lambda x: x[1], reverse=True):
-        unit = UNITS[card_name]
-        text += f"▪️ {RARITY_COLORS.get(unit['rarity'], '')} {card_name} [{unit['rarity']}] x{count}\n"
+        unit = RIGS[card_name]
+        text += f"{RARITY_COLORS.get(unit['rarity'], '')} {card_name} [{unit['rarity']}] x{count}\n"
     text += f"\n💰 Потрачено: {cost} золота"
     safe_edit(callback.message.chat.id, callback.message.message_id, text)
 
@@ -687,13 +711,31 @@ def multi_summon(callback):
 @BOT.message_handler(func=lambda m: m.text == "🏪 Магазин")
 def shop_menu(message):
     user = get_user(message.from_user.id)
-    text = f"🏪 **Магазин**\n💰 Золото: {user['gold']}"
+    text = f"🏪 **МАГАЗИН РИГОВ**\n━━━━━━━━━━━━━━━\n💰 Золото: **{user['gold']}**\n🔓 Слотов: **{user['slots_unlocked']}/4**"
     kb = types.InlineKeyboardMarkup(row_width=1)
     kb.add(
-        types.InlineKeyboardButton("📦 Легендарный пак (💰1500)", callback_data="buy_pack"),
+        types.InlineKeyboardButton("📦 Пак Ригов 💰1500", callback_data="buy_pack"),
+        types.InlineKeyboardButton("🔓 4-й слот 💰350000", callback_data="buy_slot_4"),
         types.InlineKeyboardButton("⚡ Прокачка", callback_data="shop_upgrades")
     )
     BOT.send_message(message.chat.id, text, parse_mode="Markdown", reply_markup=kb)
+
+@BOT.callback_query_handler(func=lambda c: c.data == "buy_slot_4")
+def buy_slot_4(callback):
+    user = get_user(callback.from_user.id)
+    if user["slots_unlocked"] >= 4:
+        return BOT.answer_callback_query(callback.id, "❌ 4-й слот уже открыт!", show_alert=True)
+    if user["gold"] < 350000:
+        return BOT.answer_callback_query(callback.id, f"❌ Нужно 350000 💰! У вас {user['gold']}", show_alert=True)
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET slots_unlocked = 4, gold = gold - 350000 WHERE user_id = ?", (callback.from_user.id,))
+    conn.commit()
+    return_db_connection(conn)
+    clear_user_cache(callback.from_user.id)
+    BOT.answer_callback_query(callback.id, "🎉 4-й слот открыт!", show_alert=True)
+    shop_menu(callback.message)
 
 @BOT.callback_query_handler(func=lambda c: c.data == "buy_pack")
 def buy_pack(callback):
@@ -702,45 +744,54 @@ def buy_pack(callback):
         return BOT.answer_callback_query(callback.id, "❌ Нужно 1500 💰", show_alert=True)
     
     card_name = roll_pack()
-    color = RARITY_COLORS.get(UNITS[card_name]['rarity'], '')
+    if card_name == "Ксеро":
+        rarity = "УЛЬТРА"
+        color = "💀"
+    elif card_name == "Гигантский Коррупт Риг":
+        rarity = "Супер"
+        color = "🔥"
+    else:
+        rarity = RIGS[card_name]["rarity"]
+        color = RARITY_COLORS.get(rarity, "")
+    
     update_user_stats(callback.from_user.id, gold=-1500)
     variant = get_unit_variant()
     variant_label = UNIT_VARIANTS[variant]["label"]
     variant, hp, atk = create_unit(callback.from_user.id, card_name, variant)
     consolidate_inventory(callback.from_user.id)
     
+    # Скрываем информацию о Ксеро в сообщении о паке
+    if card_name == "Ксеро":
+        display_name = "❓ Неизвестный Риг"
+        display_rarity = "???"
+    else:
+        display_name = card_name
+        display_rarity = rarity
+    
     safe_edit(callback.message.chat.id, callback.message.message_id,
-              f"📦 **Легендарный пак открыт!**\n\n{color} **{card_name}**\n📊 {UNITS[card_name]['rarity']}\n❤️ HP: {hp} | ⚔️ ATK: {atk}\n{variant_label}")
+              f"📦 **ПАК РИГОВ ОТКРЫТ!**\n━━━━━━━━━━━━━━━\n{color} **{display_name}**\n📊 {display_rarity}\n❤️ HP: {hp}\n⚔️ ATK: {atk}\n{variant_label}")
 
 @BOT.callback_query_handler(func=lambda c: c.data == "shop_upgrades")
 def shop_upgrades(callback):
     user = get_user(callback.from_user.id)
-    slot_cost = 6500
     gold_up = 1000 + user["mult_gold_lvl"] * 1200
     atk_up = 1500 + user["mult_atk_lvl"] * 1500
     
-    text = f"⚡ **ПРОКАЧКА**\n💰 Золото: {user['gold']}\n\n▪️ Слотов: {user['slots_unlocked']}/4\n▪️ Бонус золота: +{user['mult_gold_lvl']*25}%\n▪️ Бонус урона: +{user['mult_atk_lvl']*15}%"
+    text = f"⚡ **ПРОКАЧКА**\n━━━━━━━━━━━━━━━\n💰 Золото: **{user['gold']}**\n\n📊 Текущие бонусы:\n▸ Золото: `+{user['mult_gold_lvl']*25}%`\n▸ Урон: `+{user['mult_atk_lvl']*15}%`"
     kb = types.InlineKeyboardMarkup(row_width=1)
-    if user["slots_unlocked"] < 4:
-        kb.add(types.InlineKeyboardButton(f"🔓 4-й слот (💰{slot_cost})", callback_data="up_slot"))
     kb.add(types.InlineKeyboardButton(f"💰 +25% золота (💰{gold_up})", callback_data="up_gold"))
     kb.add(types.InlineKeyboardButton(f"⚔️ +15% урона (💰{atk_up})", callback_data="up_atk"))
+    kb.add(types.InlineKeyboardButton("⬅️ Назад", callback_data="shop_back"))
     safe_edit(callback.message.chat.id, callback.message.message_id, text, reply_markup=kb)
+
+@BOT.callback_query_handler(func=lambda c: c.data == "shop_back")
+def shop_back(callback):
+    shop_menu(callback.message)
 
 @BOT.callback_query_handler(func=lambda c: c.data.startswith("up_"))
 def process_upgrade(callback):
     user = get_user(callback.from_user.id)
-    if callback.data == "up_slot":
-        if user["slots_unlocked"] >= 4: return BOT.answer_callback_query(callback.id, "❌ Уже открыт!", show_alert=True)
-        if user["gold"] < 6500: return BOT.answer_callback_query(callback.id, "❌ Нужно 6500 💰", show_alert=True)
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE users SET slots_unlocked = 4, gold = gold - 6500 WHERE user_id = ?", (callback.from_user.id,))
-        conn.commit()
-        return_db_connection(conn)
-        clear_user_cache(callback.from_user.id)
-        BOT.answer_callback_query(callback.id, "🎉 4-й слот открыт!", show_alert=True)
-    elif callback.data == "up_gold":
+    if callback.data == "up_gold":
         cost = 1000 + user["mult_gold_lvl"] * 1200
         if user["gold"] < cost: return BOT.answer_callback_query(callback.id, f"❌ Нужно {cost} 💰", show_alert=True)
         conn = get_db_connection()
@@ -762,18 +813,18 @@ def process_upgrade(callback):
         BOT.answer_callback_query(callback.id, f"🎉 Уровень {user['mult_atk_lvl']+1}!", show_alert=True)
     shop_upgrades(callback)
 
-# --- ДАНЖ ---
-@BOT.message_handler(func=lambda m: m.text == "🏰 Данж")
+# --- БИТВА ---
+@BOT.message_handler(func=lambda m: m.text == "🏰 Битва")
 def dungeon_menu(message):
     team = get_equipped_team(message.from_user.id)
     if not team:
-        return BOT.send_message(message.chat.id, "❌ Отряд пуст!")
+        return BOT.send_message(message.chat.id, "❌ **Отряд пуст!**\nАктивируйте риги в инвентаре.")
     kb = types.InlineKeyboardMarkup(row_width=2)
     for key, diff in DIFFICULTIES.items():
-        kb.add(types.InlineKeyboardButton(f"{diff['name']} (x{diff['mult']})", callback_data=f"dng_{key}"))
+        kb.add(types.InlineKeyboardButton(f"{diff['name']}", callback_data=f"dng_{key}"))
     if get_setting("ultra_mode", "0") == "1":
         kb.add(types.InlineKeyboardButton("💀 УЛЬТРА-КРИЗИС", callback_data="dng_ultra"))
-    BOT.send_message(message.chat.id, "🏰 **Выберите сложность:**", reply_markup=kb)
+    BOT.send_message(message.chat.id, "⚔️ **ВЫБЕРИТЕ СЛОЖНОСТЬ**", reply_markup=kb)
 
 active_battles = {}
 
@@ -785,13 +836,13 @@ def fight_dungeon(callback):
     if not team: return
     
     if diff_key == "ultra":
-        diff = {"name": "УЛЬТРА-КРИЗИС 💀", "mult": 50.0, "gold": (1000, 2000), "exp": 2000, "enemies": 8, "pass_exp": 2000, "no_cups": True}
+        diff = {"name": "💀 УЛЬТРА-КРИЗИС", "mult": 50.0, "gold": (1000, 2000), "exp": 2000, "enemies": 8, "pass_exp": 2000, "no_cups": True}
     else:
         diff = DIFFICULTIES[diff_key].copy()
         diff["pass_exp"] = 30
         diff["no_cups"] = False
     
-    msg = BOT.send_message(callback.message.chat.id, "⚔️ *Бой начат...*")
+    msg = BOT.send_message(callback.message.chat.id, "⚔️ *Битва началась...*")
     
     player_max_hp = sum(c['hp'] for c in team)
     player_atk = sum(c['atk'] for c in team) * (1 + user["mult_atk_lvl"] * 0.15)
@@ -814,8 +865,9 @@ def process_battle_round(message_id):
     battle["hit_counter"] += 1
     damage = battle["final_player_atk"]
     
-    has_ultra = any(c["name"] == "Ультра-Некрос" for c in get_equipped_team(battle["user_id"]))
-    has_exclusive = any(c["name"] in ["Король-лич", "Первородный хаос"] for c in get_equipped_team(battle["user_id"]))
+    team = get_equipped_team(battle["user_id"])
+    has_ultra = any(c["name"] == "Ксеро" for c in team)
+    has_exclusive = any(c["name"] in ["Король Ригов", "Изначальный Риг"] for c in team)
     
     if has_ultra and battle["hit_counter"] % 3 == 0:
         damage *= 5
@@ -839,7 +891,7 @@ def process_battle_round(message_id):
     
     p_bar = generate_hp_bar(battle["player_hp"], battle["player_max_hp"])
     e_bar = generate_hp_bar(battle["enemy_hp"], battle["enemy_max_hp"])
-    text = f"⚔️ **{battle['diff']['name']}** ({battle['current_enemy']}/{battle['total_enemies']})\n\n🛡 {battle['player_hp']}/{battle['player_max_hp']}\n{p_bar}\n\n👹 {battle['enemy_hp']}/{battle['enemy_max_hp']}\n{e_bar}\n⚔️ Урон: {battle['enemy_atk']}"
+    text = f"⚔️ **{battle['diff']['name']}**\nВраг {battle['current_enemy']}/{battle['total_enemies']}\n━━━━━━━━━━━━━━━\n🛡 **Отряд**\n{battle['player_hp']}/{battle['player_max_hp']}\n{p_bar}\n\n👹 **Противник**\n{battle['enemy_hp']}/{battle['enemy_max_hp']}\n{e_bar}\n⚔️ Урон: {battle['enemy_atk']}"
     try: BOT.edit_message_text(text, chat_id=battle["chat_id"], message_id=message_id, parse_mode="Markdown")
     except: pass
     threading.Timer(1.0, process_battle_round, args=[message_id]).start()
@@ -850,7 +902,7 @@ def finish_battle_victory(message_id):
     gold = int(random.randint(battle["diff"]["gold"][0], battle["diff"]["gold"][1]) * gold_mult)
     cups = 0 if battle["diff"].get("no_cups") else random.randint(15, 35)
     update_user_stats(battle["user_id"], gold=gold, exp=battle["diff"]["exp"], trophies=cups, pass_exp=battle["diff"]["pass_exp"])
-    text = f"🎉 **Победа!**\n💰 +{gold} золота\n🏆 +{cups} кубков" + ("" if not battle["diff"].get("no_cups") else "\n⚠️ Кубки не начислены")
+    text = f"🎉 **ПОБЕДА!**\n━━━━━━━━━━━━━━━\n💰 +{gold} золота\n🏆 +{cups} кубков" + ("" if not battle["diff"].get("no_cups") else "\n⚠️ Кубки не начислены")
     try: BOT.edit_message_text(text, chat_id=battle["chat_id"], message_id=message_id, parse_mode="Markdown")
     except: pass
     del active_battles[message_id]
@@ -859,7 +911,7 @@ def finish_battle_defeat(message_id):
     battle = active_battles[message_id]
     loss = -200 if battle["diff"].get("no_cups") else -20
     update_user_stats(battle["user_id"], trophies=loss)
-    text = f"💀 **Поражение!** Потеряно {abs(loss)} кубков"
+    text = f"💀 **ПОРАЖЕНИЕ!**\n━━━━━━━━━━━━━━━\nПотеряно {abs(loss)} кубков"
     try: BOT.edit_message_text(text, chat_id=battle["chat_id"], message_id=message_id, parse_mode="Markdown")
     except: pass
     del active_battles[message_id]
@@ -869,10 +921,10 @@ def finish_battle_defeat(message_id):
 def boss_fight(message):
     user = get_user(message.from_user.id)
     team = get_equipped_team(message.from_user.id)
-    if not team: return BOT.send_message(message.chat.id, "❌ Отряд пуст!")
+    if not team: return BOT.send_message(message.chat.id, "❌ **Отряд пуст!**")
     if time.time() - user["last_boss"] < 3600:
         rem = int(3600 - (time.time() - user["last_boss"]))
-        return BOT.send_message(message.chat.id, f"⏳ {rem//60} мин до босса")
+        return BOT.send_message(message.chat.id, f"⏳ **Кулдаун:** {rem//60} мин {rem%60} сек")
     
     msg = BOT.send_message(message.chat.id, "👹 *Босс пробуждается...*")
     player_max_hp = sum(c['hp'] for c in team)
@@ -894,8 +946,9 @@ def process_boss_round(battle_id):
     battle["hit_counter"] += 1
     damage = battle["final_player_atk"]
     
-    has_ultra = any(c["name"] == "Ультра-Некрос" for c in get_equipped_team(battle["user_id"]))
-    has_exclusive = any(c["name"] in ["Король-лич", "Первородный хаос"] for c in get_equipped_team(battle["user_id"]))
+    team = get_equipped_team(battle["user_id"])
+    has_ultra = any(c["name"] == "Ксеро" for c in team)
+    has_exclusive = any(c["name"] in ["Король Ригов", "Изначальный Риг"] for c in team)
     
     if has_ultra and battle["hit_counter"] % 3 == 0:
         damage *= 5
@@ -907,7 +960,7 @@ def process_boss_round(battle_id):
         gold_mult = 1 + get_user(battle["user_id"])["mult_gold_lvl"] * 0.25
         gold = int(500 * gold_mult)
         update_user_stats(battle["user_id"], gold=gold, trophies=80, pass_exp=75, last_boss=time.time())
-        text = f"🏆 **Босс повержен!**\n💰 +{gold} золота\n🏆 +80 кубков"
+        text = f"🏆 **БОСС ПОВЕРЖЕН!**\n━━━━━━━━━━━━━━━\n💰 +{gold} золота\n🏆 +80 кубков"
         try: BOT.edit_message_text(text, chat_id=battle["chat_id"], message_id=battle["message_id"], parse_mode="Markdown")
         except: pass
         del active_battles[battle_id]
@@ -916,7 +969,7 @@ def process_boss_round(battle_id):
     battle["player_hp"] -= battle["boss_atk"]
     if battle["player_hp"] <= 0:
         update_user_stats(battle["user_id"], last_boss=time.time())
-        text = "💥 **Поражение от босса!**"
+        text = "💥 **ПОРАЖЕНИЕ!**"
         try: BOT.edit_message_text(text, chat_id=battle["chat_id"], message_id=battle["message_id"], parse_mode="Markdown")
         except: pass
         del active_battles[battle_id]
@@ -924,28 +977,28 @@ def process_boss_round(battle_id):
     
     p_bar = generate_hp_bar(battle["player_hp"], battle["player_max_hp"])
     b_bar = generate_hp_bar(battle["boss_hp"], battle["boss_max_hp"])
-    text = f"👹 **БОСС**\n\n🛡 {battle['player_hp']}/{battle['player_max_hp']}\n{p_bar}\n\n🔥 {battle['boss_hp']}/{battle['boss_max_hp']}\n{b_bar}\n⚔️ Урон: {battle['boss_atk']}"
+    text = f"👹 **БОСС**\n━━━━━━━━━━━━━━━\n🛡 **Отряд**\n{battle['player_hp']}/{battle['player_max_hp']}\n{p_bar}\n\n🔥 **Босс**\n{battle['boss_hp']}/{battle['boss_max_hp']}\n{b_bar}\n⚔️ Урон: {battle['boss_atk']}"
     try: BOT.edit_message_text(text, chat_id=battle["chat_id"], message_id=battle["message_id"], parse_mode="Markdown")
     except: pass
     threading.Timer(1.0, process_boss_round, args=[battle_id]).start()
 
 # --- БОЕВОЙ ПАСС ---
-@BOT.message_handler(func=lambda m: m.text == "🎫 Боевой Пасс")
+@BOT.message_handler(func=lambda m: m.text == "🎫 Пасс")
 def view_battle_pass(message):
     user = get_user(message.from_user.id)
     needed = get_pass_exp_required(user["pass_lvl"])
-    progress = f"{user['pass_exp']}/{needed} XP" if user["pass_lvl"] < 15 else "МАКСИМУМ ✅"
-    text = f"🎫 **БОЕВОЙ ПАСС**\nУровень: {user['pass_lvl']}/15\nПрогресс: {progress}\n\n📜 Награды:\n"
+    progress = f"{user['pass_exp']}/{needed} XP" if user["pass_lvl"] < 15 else "✅ МАКСИМУМ"
+    text = f"🎫 **БОЕВОЙ ПАСС**\n━━━━━━━━━━━━━━━\nУровень: **{user['pass_lvl']}/15**\nПрогресс: `{progress}`\n\n📜 **НАГРАДЫ:**\n"
     for lvl in range(1, 16):
         status = "✅" if user["pass_lvl"] >= lvl else f"🔒 {get_pass_exp_required(lvl)} XP"
-        text += f"▪️ Ур.{lvl}: {PASS_REWARDS[lvl]['name']} — {status}\n"
+        text += f"▸ Ур.{lvl}: {PASS_REWARDS[lvl]['name']} — {status}\n"
     BOT.send_message(message.chat.id, text, parse_mode="Markdown")
 
 # --- КРАФТ ---
 @BOT.message_handler(func=lambda m: m.text == "🔧 Крафт")
 def craft_menu(message):
     user = get_user(message.from_user.id)
-    text = f"🔧 **КРАФТ: ПЕРВОРОДНЫЙ ХАОС**\n💰 Стоимость: 100000 золота\n\nТребуется:\n▪️ Ультра-Некрос (УЛЬТРА) x1\n▪️ 2 Божественных юнита\n▪️ 3 Мифических юнита"
+    text = f"🔧 **КРАФТ: ИЗНАЧАЛЬНЫЙ РИГ**\n━━━━━━━━━━━━━━━\n💰 Стоимость: **100000** золота\n\n📋 Требуется:\n▸ Ксеро (УЛЬТРА) x1\n▸ 2 Божественных рига\n▸ 3 Мифических рига"
     kb = types.InlineKeyboardMarkup(row_width=1)
     kb.add(types.InlineKeyboardButton("⚡ КРАФТНУТЬ", callback_data="craft_chaos"))
     BOT.send_message(message.chat.id, text, parse_mode="Markdown", reply_markup=kb)
@@ -959,41 +1012,36 @@ def craft_chaos(callback):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Проверка Ультра-Некроса
-    cursor.execute("SELECT COUNT(*) FROM inventory WHERE user_id = ? AND card_name = 'Ультра-Некрос' AND is_equipped = 0", (callback.from_user.id,))
+    cursor.execute("SELECT COUNT(*) FROM inventory WHERE user_id = ? AND card_name = 'Ксеро' AND is_equipped = 0", (callback.from_user.id,))
     if cursor.fetchone()[0] < 1:
         return_db_connection(conn)
-        return BOT.answer_callback_query(callback.id, "❌ Нет Ультра-Некроса!", show_alert=True)
+        return BOT.answer_callback_query(callback.id, "❌ Нет Ксеро!", show_alert=True)
     
-    # Проверка божественных
-    cursor.execute("SELECT COUNT(*) FROM inventory WHERE user_id = ? AND rarity = 'Божественная' AND is_equipped = 0", (callback.from_user.id,))
+    cursor.execute("SELECT COUNT(*) FROM inventory WHERE user_id = ? AND rarity = 'Божественный' AND is_equipped = 0", (callback.from_user.id,))
     if cursor.fetchone()[0] < 2:
         return_db_connection(conn)
-        return BOT.answer_callback_query(callback.id, "❌ Нужно 2 Божественных юнита!", show_alert=True)
+        return BOT.answer_callback_query(callback.id, "❌ Нужно 2 Божественных рига!", show_alert=True)
     
-    # Проверка мифических
-    cursor.execute("SELECT COUNT(*) FROM inventory WHERE user_id = ? AND rarity = 'Мифическая' AND is_equipped = 0", (callback.from_user.id,))
+    cursor.execute("SELECT COUNT(*) FROM inventory WHERE user_id = ? AND rarity = 'Мифический' AND is_equipped = 0", (callback.from_user.id,))
     if cursor.fetchone()[0] < 3:
         return_db_connection(conn)
-        return BOT.answer_callback_query(callback.id, "❌ Нужно 3 Мифических юнита!", show_alert=True)
+        return BOT.answer_callback_query(callback.id, "❌ Нужно 3 Мифических рига!", show_alert=True)
     
-    # Тратим ресурсы
-    cursor.execute("DELETE FROM inventory WHERE user_id = ? AND card_name = 'Ультра-Некрос' AND is_equipped = 0 LIMIT 1", (callback.from_user.id,))
-    cursor.execute("DELETE FROM inventory WHERE user_id = ? AND rarity = 'Божественная' AND is_equipped = 0 LIMIT 2", (callback.from_user.id,))
-    cursor.execute("DELETE FROM inventory WHERE user_id = ? AND rarity = 'Мифическая' AND is_equipped = 0 LIMIT 3", (callback.from_user.id,))
+    cursor.execute("DELETE FROM inventory WHERE user_id = ? AND card_name = 'Ксеро' AND is_equipped = 0 LIMIT 1", (callback.from_user.id,))
+    cursor.execute("DELETE FROM inventory WHERE user_id = ? AND rarity = 'Божественный' AND is_equipped = 0 LIMIT 2", (callback.from_user.id,))
+    cursor.execute("DELETE FROM inventory WHERE user_id = ? AND rarity = 'Мифический' AND is_equipped = 0 LIMIT 3", (callback.from_user.id,))
     cursor.execute("UPDATE users SET gold = gold - 100000 WHERE user_id = ?", (callback.from_user.id,))
     
-    # Создаем
-    unit = UNITS["Первородный хаос"]
+    unit = RIGS["Изначальный Риг"]
     cursor.execute("INSERT INTO inventory (user_id, card_name, rarity, level, hp, atk, variant) VALUES (?, ?, ?, 1, ?, ?, ?)",
-                  (callback.from_user.id, "Первородный хаос", "Эксклюзив", unit["hp"], unit["atk"], "обычный"))
+                  (callback.from_user.id, "Изначальный Риг", "Эксклюзив", unit["hp"], unit["atk"], "обычный"))
     conn.commit()
     return_db_connection(conn)
     clear_user_cache(callback.from_user.id)
     
-    BOT.answer_callback_query(callback.id, "👑 ПЕРВОРОДНЫЙ ХАОС СОЗДАН!", show_alert=True)
+    BOT.answer_callback_query(callback.id, "👑 ИЗНАЧАЛЬНЫЙ РИГ СОЗДАН!", show_alert=True)
     BOT.send_message(callback.message.chat.id, 
-                    f"👑 **КРАФТ УСПЕШЕН!**\nСоздан: Первородный хаос (Эксклюзив)\n❤️ HP: {unit['hp']}\n⚔️ ATK: {unit['atk']}")
+                    f"👑 **КРАФТ УСПЕШЕН!**\n━━━━━━━━━━━━━━━\nСоздан: **Изначальный Риг** (Эксклюзив)\n❤️ HP: {unit['hp']}\n⚔️ ATK: {unit['atk']}")
 
 # --- ИНДЕКС ---
 @BOT.message_handler(func=lambda m: m.text == "📖 Индекс")
@@ -1001,15 +1049,15 @@ def index_msg(message):
     send_index(message.chat.id, 0)
 
 def send_index(chat_id, page=0):
-    limit, total_pages = 10, (len(INDEX_UNITS)+9)//10
+    limit, total_pages = 10, (len(INDEX_RIGS)+9)//10
     page = max(0, min(page, total_pages-1))
-    start, end = page*limit, min((page+1)*limit, len(INDEX_UNITS))
+    start, end = page*limit, min((page+1)*limit, len(INDEX_RIGS))
     
-    text = f"📖 **ИНДЕКС (Стр.{page+1}/{total_pages}):**"
+    text = f"📖 **ИНДЕКС РИГОВ**\nСтраница {page+1}/{total_pages}\n━━━━━━━━━━━━━━━"
     kb = types.InlineKeyboardMarkup(row_width=1)
-    for u_name in INDEX_UNITS[start:end]:
-        rar = UNITS[u_name]["rarity"]
-        kb.add(types.InlineKeyboardButton(f"{RARITY_COLORS.get(rar,'')} [{rar}] {u_name}", callback_data=f"idxinfo_{UNITS_LIST.index(u_name)}_{page}"))
+    for r_name in INDEX_RIGS[start:end]:
+        rar = RIGS[r_name]["rarity"]
+        kb.add(types.InlineKeyboardButton(f"{RARITY_COLORS.get(rar,'')} [{rar}] {r_name}", callback_data=f"idxinfo_{ALL_RIGS.index(r_name)}_{page}"))
     
     nav = []
     if page > 0: nav.append(types.InlineKeyboardButton("⬅️", callback_data=f"idxpage_{page-1}"))
@@ -1027,9 +1075,9 @@ def index_page_cb(callback):
 @BOT.callback_query_handler(func=lambda c: c.data.startswith("idxinfo_"))
 def index_info_cb(callback):
     _, u_idx, from_page = callback.data.split("_")
-    u_name = UNITS_LIST[int(u_idx)]
-    unit = UNITS[u_name]
-    text = f"🔬 **{RARITY_COLORS.get(unit['rarity'],'')} {u_name}**\n📊 {unit['rarity']}\n❤️ HP: {unit['hp']}\n⚔️ ATK: {unit['atk']}"
+    r_name = ALL_RIGS[int(u_idx)]
+    unit = RIGS[r_name]
+    text = f"🔬 **{RARITY_COLORS.get(unit['rarity'],'')} {r_name}**\n━━━━━━━━━━━━━━━\n📊 Редкость: {unit['rarity']}\n❤️ HP: {unit['hp']}\n⚔️ ATK: {unit['atk']}"
     kb = types.InlineKeyboardMarkup()
     kb.add(types.InlineKeyboardButton("⬅️ Назад", callback_data=f"idxpage_{from_page}"))
     safe_edit(callback.message.chat.id, callback.message.message_id, text, reply_markup=kb)
@@ -1043,39 +1091,39 @@ def show_top(message):
     rows = cursor.fetchall()
     return_db_connection(conn)
     
-    text = "🏆 **НЕДЕЛЬНЫЙ РЕЙТИНГ**\n\n"
-    text += f"⏳ {get_week_time_left()}\n\n🏅 Награды: 150к/100к/50к золота\n\n📊 Топ:\n"
+    text = "🏆 **НЕДЕЛЬНЫЙ РЕЙТИНГ**\n━━━━━━━━━━━━━━━\n"
+    text += f"⏳ До обновления: {get_week_time_left()}\n\n🏅 **Награды:**\n🥇 150к 💰\n🥈 100к 💰\n🥉 50к 💰\n\n📊 **ТОП 10:**\n"
     for i, r in enumerate(rows, 1):
         medal = "🥇" if i==1 else "🥈" if i==2 else "🥉" if i==3 else f"{i}."
-        text += f"{medal} {html.escape(r[0] or 'Unknown')} — {r[1]} 🏆\n"
+        text += f"{medal} {html.escape(r[0] or 'Неизвестный')} — {r[1]} 🏆\n"
     BOT.send_message(message.chat.id, text, parse_mode="HTML")
 
 # --- АДМИН ПАНЕЛЬ ---
-@BOT.message_handler(func=lambda m: m.text == "👑 Админ Панель" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
+@BOT.message_handler(func=lambda m: m.text == "👑 Админ" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_panel(message):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    kb.add("⚙️ Ресурсы", "🔮 Удача", "💀 Ультра-Кризис", "⏰ Босс Таймер", "🃏 Галерея", "🏆 Сброс Топа", "📢 Сообщение", "⬅️ Назад")
-    BOT.send_message(message.chat.id, "👑 **Админ Панель**", reply_markup=kb)
+    kb.add("⚙️ Ресурсы", "🔮 Удача", "💀 Кризис", "⏰ Босс", "🃏 Галерея", "🏆 Сброс", "📢 Сообщение", "⬅️ Назад")
+    BOT.send_message(message.chat.id, "👑 **АДМИН ПАНЕЛЬ**", reply_markup=kb)
 
 @BOT.message_handler(func=lambda m: m.text == "⚙️ Ресурсы" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_resources(message):
     kb = types.InlineKeyboardMarkup(row_width=1)
     kb.add(
-        types.InlineKeyboardButton("👤 Золото игроку", callback_data="wiz_gold"),
-        types.InlineKeyboardButton("👤 Кубки игроку", callback_data="wiz_cups"),
+        types.InlineKeyboardButton("👤 Золото", callback_data="wiz_gold"),
+        types.InlineKeyboardButton("👤 Кубки", callback_data="wiz_cups"),
         types.InlineKeyboardButton("📢 Золото ВСЕМ", callback_data="wiz_gold_all"),
         types.InlineKeyboardButton("📢 Кубки ВСЕМ", callback_data="wiz_cups_all")
     )
-    BOT.send_message(message.chat.id, "🎛 **Ресурсы**", reply_markup=kb)
+    BOT.send_message(message.chat.id, "🎛 **УПРАВЛЕНИЕ РЕСУРСАМИ**", reply_markup=kb)
 
 @BOT.message_handler(func=lambda m: m.text == "🔮 Удача" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_luck(message):
     luck = get_setting("luck_multiplier", "1.0")
     kb = types.InlineKeyboardMarkup(row_width=1)
     kb.add(types.InlineKeyboardButton("⚙️ Задать", callback_data="luck_set"), types.InlineKeyboardButton("🔄 Сбросить", callback_data="luck_reset"))
-    BOT.send_message(message.chat.id, f"🔮 Удача: {luck}x", reply_markup=kb)
+    BOT.send_message(message.chat.id, f"🔮 **УДАЧА:** {luck}x", reply_markup=kb)
 
-@BOT.message_handler(func=lambda m: m.text == "💀 Ультра-Кризис" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
+@BOT.message_handler(func=lambda m: m.text == "💀 Кризис" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_ultra(message):
     state = get_setting("ultra_mode", "0")
     kb = types.InlineKeyboardMarkup(row_width=2)
@@ -1083,54 +1131,54 @@ def admin_ultra(message):
         types.InlineKeyboardButton("🟢 Вкл", callback_data="ultra_on"),
         types.InlineKeyboardButton("🔴 Выкл", callback_data="ultra_off")
     )
-    BOT.send_message(message.chat.id, f"💀 Ультра-Кризис: {'🟢 ВКЛ' if state=='1' else '🔴 ВЫКЛ'}", reply_markup=kb)
+    BOT.send_message(message.chat.id, f"💀 **УЛЬТРА-КРИЗИС:** {'🟢 ВКЛ' if state=='1' else '🔴 ВЫКЛ'}", reply_markup=kb)
 
-@BOT.message_handler(func=lambda m: m.text == "⏰ Босс Таймер" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
+@BOT.message_handler(func=lambda m: m.text == "⏰ Босс" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_boss_timer(message):
     kb = types.InlineKeyboardMarkup(row_width=1)
     kb.add(
         types.InlineKeyboardButton("🕒 Сбросить СВОЙ", callback_data="boss_reset_self"),
         types.InlineKeyboardButton("🌍 Сбросить ВСЕМ", callback_data="boss_reset_all")
     )
-    BOT.send_message(message.chat.id, "⏰ **Босс Таймер**", reply_markup=kb)
+    BOT.send_message(message.chat.id, "⏰ **УПРАВЛЕНИЕ БОССОМ**", reply_markup=kb)
 
 @BOT.message_handler(func=lambda m: m.text == "🃏 Галерея" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_gallery(message):
     render_gallery(message, 0)
 
 def render_gallery(message, page):
-    limit, total_pages = 8, (len(UNITS_LIST)+7)//8
+    limit, total_pages = 8, (len(ALL_RIGS)+7)//8
     page = max(0, min(page, total_pages-1))
-    start, end = page*limit, min((page+1)*limit, len(UNITS_LIST))
+    start, end = page*limit, min((page+1)*limit, len(ALL_RIGS))
     
     kb = types.InlineKeyboardMarkup(row_width=1)
-    for u_name in UNITS_LIST[start:end]:
-        u = UNITS[u_name]
-        kb.add(types.InlineKeyboardButton(f"{RARITY_COLORS.get(u['rarity'],'')} [{u['rarity']}] {u_name}", 
-                                         callback_data=f"give_{UNITS_LIST.index(u_name)}"))
+    for r_name in ALL_RIGS[start:end]:
+        u = RIGS[r_name]
+        kb.add(types.InlineKeyboardButton(f"{RARITY_COLORS.get(u['rarity'],'')} [{u['rarity']}] {r_name}", 
+                                         callback_data=f"give_{ALL_RIGS.index(r_name)}"))
     
     nav = []
     if page > 0: nav.append(types.InlineKeyboardButton("⬅️", callback_data=f"galpage_{page-1}"))
     nav.append(types.InlineKeyboardButton(f"{page+1}/{total_pages}", callback_data="void"))
     if page < total_pages-1: nav.append(types.InlineKeyboardButton("➡️", callback_data=f"galpage_{page+1}"))
     kb.row(*nav)
-    BOT.send_message(message.chat.id, "🃏 **Галерея**", reply_markup=kb)
+    BOT.send_message(message.chat.id, "🃏 **ГАЛЕРЕЯ РИГОВ**", reply_markup=kb)
 
-@BOT.message_handler(func=lambda m: m.text == "🏆 Сброс Топа" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
+@BOT.message_handler(func=lambda m: m.text == "🏆 Сброс" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_reset_top(message):
     kb = types.InlineKeyboardMarkup()
-    kb.add(types.InlineKeyboardButton("🏆 Сбросить", callback_data="reset_top"))
-    BOT.send_message(message.chat.id, "⚠️ Сбросить рейтинг?", reply_markup=kb)
+    kb.add(types.InlineKeyboardButton("🏆 Сбросить рейтинг", callback_data="reset_top"))
+    BOT.send_message(message.chat.id, "⚠️ **СБРОС РЕЙТИНГА**\nНаграды будут выданы победителям!", reply_markup=kb)
 
 @BOT.message_handler(func=lambda m: m.text == "📢 Сообщение" and m.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def admin_message(message):
-    msg = BOT.send_message(message.chat.id, "📢 Введите сообщение:")
+    msg = BOT.send_message(message.chat.id, "📢 Введите сообщение для всех игроков:")
     BOT.register_next_step_handler(msg, admin_send_global)
 
 # --- АДМИН КОЛБЭКИ ---
 @BOT.callback_query_handler(func=lambda c: c.data == "wiz_gold" and c.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def wiz_gold(callback):
-    msg = BOT.send_message(callback.message.chat.id, "Введите ID игрока или 'я':")
+    msg = BOT.send_message(callback.message.chat.id, "👤 Введите ID игрока или 'я':")
     BOT.register_next_step_handler(msg, wiz_gold_step2)
 
 def wiz_gold_step2(message):
@@ -1138,7 +1186,7 @@ def wiz_gold_step2(message):
     try:
         pid = message.from_user.id if message.text.lower() == "я" else int(message.text)
         get_user(pid)
-        msg = BOT.send_message(message.chat.id, f"Сколько золота для {pid}?")
+        msg = BOT.send_message(message.chat.id, f"💰 Сколько золота для {pid}?")
         BOT.register_next_step_handler(msg, wiz_gold_final, pid)
     except: BOT.send_message(message.chat.id, "❌ Неверный ID")
 
@@ -1152,7 +1200,7 @@ def wiz_gold_final(message, pid):
 
 @BOT.callback_query_handler(func=lambda c: c.data == "wiz_cups" and c.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def wiz_cups(callback):
-    msg = BOT.send_message(callback.message.chat.id, "Введите ID игрока или 'я':")
+    msg = BOT.send_message(callback.message.chat.id, "👤 Введите ID игрока или 'я':")
     BOT.register_next_step_handler(msg, wiz_cups_step2)
 
 def wiz_cups_step2(message):
@@ -1160,7 +1208,7 @@ def wiz_cups_step2(message):
     try:
         pid = message.from_user.id if message.text.lower() == "я" else int(message.text)
         get_user(pid)
-        msg = BOT.send_message(message.chat.id, f"Сколько кубков для {pid}?")
+        msg = BOT.send_message(message.chat.id, f"🏆 Сколько кубков для {pid}?")
         BOT.register_next_step_handler(msg, wiz_cups_final, pid)
     except: BOT.send_message(message.chat.id, "❌ Неверный ID")
 
@@ -1174,7 +1222,7 @@ def wiz_cups_final(message, pid):
 
 @BOT.callback_query_handler(func=lambda c: c.data == "wiz_gold_all" and c.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def wiz_gold_all(callback):
-    msg = BOT.send_message(callback.message.chat.id, "Сколько золота ВСЕМ?")
+    msg = BOT.send_message(callback.message.chat.id, "💰 Сколько золота ВСЕМ?")
     BOT.register_next_step_handler(msg, wiz_gold_all_final)
 
 def wiz_gold_all_final(message):
@@ -1192,7 +1240,7 @@ def wiz_gold_all_final(message):
 
 @BOT.callback_query_handler(func=lambda c: c.data == "wiz_cups_all" and c.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def wiz_cups_all(callback):
-    msg = BOT.send_message(callback.message.chat.id, "Сколько кубков ВСЕМ?")
+    msg = BOT.send_message(callback.message.chat.id, "🏆 Сколько кубков ВСЕМ?")
     BOT.register_next_step_handler(msg, wiz_cups_all_final)
 
 def wiz_cups_all_final(message):
@@ -1210,7 +1258,7 @@ def wiz_cups_all_final(message):
 
 @BOT.callback_query_handler(func=lambda c: c.data == "luck_set" and c.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def luck_set(callback):
-    msg = BOT.send_message(callback.message.chat.id, "Введите множитель удачи (например 2.0):")
+    msg = BOT.send_message(callback.message.chat.id, "🔮 Введите множитель удачи (например 2.0):")
     BOT.register_next_step_handler(msg, luck_set_final)
 
 def luck_set_final(message):
@@ -1269,15 +1317,15 @@ def reset_top(callback):
 @BOT.callback_query_handler(func=lambda c: c.data.startswith("give_") and c.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def give_unit(callback):
     idx = int(callback.data.split("_")[1])
-    u_name = UNITS_LIST[idx]
-    u_data = UNITS[u_name]
+    r_name = ALL_RIGS[idx]
+    u_data = RIGS[r_name]
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO inventory (user_id, card_name, rarity, level, hp, atk, variant) VALUES (?, ?, ?, 1, ?, ?, ?)",
-                  (callback.from_user.id, u_name, u_data["rarity"], u_data["hp"], u_data["atk"], "обычный"))
+                  (callback.from_user.id, r_name, u_data["rarity"], u_data["hp"], u_data["atk"], "обычный"))
     conn.commit()
     return_db_connection(conn)
-    BOT.answer_callback_query(callback.id, f"✅ {u_name} получен!", show_alert=True)
+    BOT.answer_callback_query(callback.id, f"✅ {r_name} получен!", show_alert=True)
 
 @BOT.callback_query_handler(func=lambda c: c.data.startswith("galpage_") and c.from_user.id in [ADMIN_ID, ADMIN_ID_2])
 def gallery_page(callback):
@@ -1294,18 +1342,13 @@ def admin_send_global(message):
     if message.from_user.id not in [ADMIN_ID, ADMIN_ID_2]: return
     notify_all_players(f"📢 **ОБЪЯВЛЕНИЕ**\n{message.text}")
 
-# --- ХЕЛПЕР ---
-def safe_edit(chat_id, message_id, text, reply_markup=None):
-    try:
-        BOT.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode="Markdown", reply_markup=reply_markup)
-    except ApiTelegramException as e:
-        if "message is not modified" not in str(e):
-            pass
-
 # --- ЗАПУСК ---
 if __name__ == '__main__':
     init_db()
     init_leaderboard()
-    print("=== [ФЭНТЕЗИ-RPG БОТ ЗАПУЩЕН] ===")
-    print(f"=== [АДМИНЫ: {ADMIN_ID}, {ADMIN_ID_2}] ===")
+    print("=" * 40)
+    print("   🎮 БОТ РИГОВ ЗАПУЩЕН 🎮")
+    print("=" * 40)
+    print(f"   АДМИНЫ: {ADMIN_ID}, {ADMIN_ID_2}")
+    print("=" * 40)
     BOT.infinity_polling()
